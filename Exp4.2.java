@@ -79,3 +79,96 @@ Input:
 Remove Card: 10 of Diamonds
 Expected Output:
 Card removed: 10 of Diamonds
+  program code :
+  import java.util.*;
+
+class Card {
+    String suit;
+    String rank;
+
+    public Card(String rank, String suit) {
+        this.rank = rank;
+        this.suit = suit;
+    }
+
+ 
+    public String toString() {
+        return rank + " of " + suit;
+    }
+
+   
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Card card = (Card) obj;
+        return rank.equals(card.rank) && suit.equals(card.suit);
+    }
+
+
+    public int hashCode() {
+        return Objects.hash(suit, rank);
+    }
+}
+
+public class CardCollectionSystem {
+    private static Map<String, List<Card>> cardMap = new HashMap<>();
+    private static Set<Card> cardSet = new HashSet<>();
+
+    public static void addCard(String rank, String suit) {
+        Card newCard = new Card(rank, suit);
+        if (cardSet.contains(newCard)) {
+            System.out.println("Error: Card \"" + newCard + "\" already exists.");
+            return;
+        }
+        cardSet.add(newCard);
+        cardMap.putIfAbsent(suit, new ArrayList<>());
+        cardMap.get(suit).add(newCard);
+        System.out.println("Card added: " + newCard);
+    }
+
+    public static void findCardsBySuit(String suit) {
+        if (cardMap.containsKey(suit) && !cardMap.get(suit).isEmpty()) {
+            cardMap.get(suit).forEach(System.out::println);
+        } else {
+            System.out.println("No cards found for " + suit + ".");
+        }
+    }
+
+    public static void displayAllCards() {
+        if (cardSet.isEmpty()) {
+            System.out.println("No cards found.");
+        } else {
+            cardSet.forEach(System.out::println);
+        }
+    }
+
+    public static void removeCard(String rank, String suit) {
+        Card cardToRemove = new Card(rank, suit);
+        if (cardSet.remove(cardToRemove)) {
+            cardMap.get(suit).remove(cardToRemove);
+            if (cardMap.get(suit).isEmpty()) {
+                cardMap.remove(suit);
+            }
+            System.out.println("Card removed: " + cardToRemove);
+        } else {
+            System.out.println("Error: Card \"" + cardToRemove + "\" not found.");
+        }
+    }
+
+    public static void main(String[] args) {
+        addCard("Ace", "Spades");
+        addCard("King", "Hearts");
+        addCard("10", "Diamonds");
+        addCard("5", "Clubs");
+        
+        displayAllCards();
+        
+        findCardsBySuit("Hearts");
+        findCardsBySuit("Diamonds");
+        
+        removeCard("10", "Diamonds");
+        displayAllCards();
+        
+        addCard("King", "Hearts"); // Duplicate test
+    }
+}
